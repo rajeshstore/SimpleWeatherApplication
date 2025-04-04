@@ -17,14 +17,18 @@ def index():
 
         try:
             response = requests.get(url, timeout=8)
-            response.raise_for_status()
-            data = response.json()
 
-            if "main" in data:
-                temperature = data["main"]["temp"]
-                humidity = data["main"]["humidity"]  
+            if response.status_code == 404:
+                error_message = "City not found. Please enter a valid city name."
             else:
-                error_message = "City not found."
+                response.raise_for_status()
+                data = response.json()
+
+                if "main" in data:
+                    temperature = data["main"]["temp"]
+                    humidity = data["main"]["humidity"]  
+                else:
+                    error_message = "Weather data not found for the city."
 
         except requests.exceptions.Timeout:
             error_message = "Request timed out. Please try again later."
